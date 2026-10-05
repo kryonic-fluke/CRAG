@@ -12,8 +12,11 @@ An industry-standard, production-grade Corrective RAG (CRAG) system implemented 
 - **Guardrails:** Hallucination and groundedness evaluation nodes
 - **Evaluation:** Quantitative test suite measuring Faithfulness & Relevance
 
-## 📖 Documentation
+## 🔄 Pipeline Workflow
 
-- [Project Architecture & System Design](ARCHITECTURE_EXPLAINED.md)
-- [6-Day Build Roadmap](ROADMAP.md)
-- [Engineering Guidelines & Rules](rules.md)
+1. **Hybrid Retrieval:** Dense vector search (ChromaDB) fused with sparse lexical search (BM25).
+2. **Relevance Grading:** LLM node grades retrieved documents and filters out noise.
+3. **Adaptive Routing:** If documents are insufficient, automatically routes to Web Search (Tavily).
+4. **Answer Generation:** Context-augmented prompt synthesizes response.
+5. **Guardrail Validation:** Groundedness checker verifies generation against source context before returning.
+

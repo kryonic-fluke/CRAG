@@ -22,7 +22,7 @@ class SearchResult(BaseModel):
     score: float = Field(
         ..., ge=0.0, description="Relevance or fusion score (higher is more relevant)"
     )
-    retrieval_method: Literal["dense", "bm25", "hybrid"] = Field(
+    retrieval_method: Literal["dense", "bm25", "hybrid", "web"] = Field(
         ..., description="The retrieval engine that fetched or synthesized this result"
     )
     rank: Optional[int] = Field(
@@ -34,7 +34,7 @@ class SearchResult(BaseModel):
         cls,
         chunk: DocumentChunk,
         score: float,
-        method: Literal["dense", "bm25", "hybrid"],
+        method: Literal["dense", "bm25", "hybrid", "web"],
         rank: Optional[int] = None,
     ) -> "SearchResult":
         return cls(

@@ -45,4 +45,3 @@ def get_chat_llm(temperature: float = 0.0) -> Optional[Any]:
                 pass
 
     return None
-

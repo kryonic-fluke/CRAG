@@ -6,6 +6,7 @@ from app.schemas.document import (
 )
 from app.schemas.retrieval import SearchResult, HybridRetrieverConfig, RetrievalResponse
 from app.schemas.grader import GradeDocuments, GradeHallucination, GradeAnswer
+from app.schemas.api import QueryRequest, QueryResponse, SourceDocument, HealthResponse
 
 __all__ = [
     "DocumentChunk",
@@ -18,4 +19,8 @@ __all__ = [
     "GradeDocuments",
     "GradeHallucination",
     "GradeAnswer",
+    "QueryRequest",
+    "QueryResponse",
+    "SourceDocument",
+    "HealthResponse",
 ]

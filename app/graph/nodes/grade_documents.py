@@ -31,4 +31,3 @@ def grade_documents_node(
         "web_search_needed": web_search_needed,
         "search_query": question if web_search_needed else None,
     }
-

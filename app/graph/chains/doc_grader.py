@@ -91,4 +91,3 @@ def get_doc_grader_chain():
             pass
 
     return RunnableLambda(lambda inputs: MockDocGrader().invoke(inputs))
-

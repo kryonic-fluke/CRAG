@@ -10,4 +10,3 @@ class GraphState(TypedDict):
     generation: Optional[str]
     retry_count: int
     search_query: Optional[str]
-

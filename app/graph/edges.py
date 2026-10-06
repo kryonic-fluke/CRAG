@@ -6,4 +6,3 @@ def route_after_grading(state: GraphState) -> Literal["generate", "web_search"]:
     if state.get("web_search_needed", False):
         return "web_search"
     return "generate"
-

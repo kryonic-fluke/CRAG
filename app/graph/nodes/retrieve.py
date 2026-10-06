@@ -27,4 +27,3 @@ def retrieve_node(state: GraphState) -> Dict[str, Any]:
     retriever = get_default_retriever()
     response = retriever.retrieve(query=question)
     return {"documents": response.results}
-

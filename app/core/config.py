@@ -5,28 +5,43 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """
-    Application Settings powered by Pydantic Settings.
+    llm_provider: str = Field(
+        default="gemini",
+        description="LLM provider: 'gemini' or 'openai'",
+    )
 
-    Why this is better than os.getenv():
-    1. Automatic type conversion (e.g. '8000' -> int 8000, 'True' -> bool True).
-    2. Missing required values trigger explicit, early startup errors.
-    3. Seamlessly reads from .env file or system environment variables.
-    """
+    gemini_api_key: Optional[str] = Field(
+        default=None,
+        description="Google Gemini API key",
+    )
+    google_api_key: Optional[str] = Field(
+        default=None,
+        description="Alternative Google API key environment variable",
+    )
+    gemini_model_name: str = Field(
+        default="gemini-2.5-flash",
+        description="Default Gemini model identifier",
+    )
 
     openai_api_key: str = Field(
-        default="mock-key-for-local-testing", description="API key for OpenAI models"
+        default="mock-key-for-local-testing",
+        description="API key for OpenAI models",
     )
     openai_model_name: str = Field(
-        default="gpt-4o-mini", description="Default LLM model identifier"
+        default="gpt-4o-mini",
+        description="Default OpenAI model identifier",
     )
 
     tavily_api_key: Optional[str] = Field(
-        default=None, description="API key for Tavily Web Search fallback"
+        default=None,
+        description="API key for Tavily Web Search fallback",
     )
 
     chunk_size: int = Field(
-        default=500, ge=50, le=4000, description="Max character size per document chunk"
+        default=500,
+        ge=50,
+        le=4000,
+        description="Max character size per document chunk",
     )
     chunk_overlap: int = Field(
         default=100,
@@ -45,7 +60,9 @@ class Settings(BaseSettings):
     debug: bool = Field(default=True, description="Enable debug mode")
 
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 

@@ -49,4 +49,3 @@ def get_generation_chain():
             pass
 
     return RunnableLambda(lambda inputs: MockGenerator().invoke(inputs))
-

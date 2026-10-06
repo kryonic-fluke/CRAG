@@ -8,6 +8,7 @@ def generate_node(
 ) -> Dict[str, Any]:
     question = state["question"]
     documents = state.get("documents", [])
+    current_retry = state.get("retry_count", 0)
 
     chain = generator_chain or get_generation_chain()
 
@@ -16,5 +17,5 @@ def generate_node(
 
     return {
         "generation": generation,
+        "retry_count": current_retry + 1,
     }
-

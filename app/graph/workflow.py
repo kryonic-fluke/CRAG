@@ -5,7 +5,7 @@ from app.graph.nodes.retrieve import retrieve_node
 from app.graph.nodes.grade_documents import grade_documents_node
 from app.graph.nodes.web_search import web_search_node
 from app.graph.nodes.generate import generate_node
-from app.graph.edges import route_after_grading
+from app.graph.edges import route_after_grading, check_hallucination_and_relevance
 
 
 def create_crag_graph():
@@ -29,6 +29,15 @@ def create_crag_graph():
     )
 
     workflow.add_edge("web_search", "generate")
-    workflow.add_edge("generate", END)
+
+    workflow.add_conditional_edges(
+        "generate",
+        check_hallucination_and_relevance,
+        {
+            "useful": END,
+            "not_useful": "web_search",
+            "not_grounded": "generate",
+        },
+    )
 
     return workflow.compile()

@@ -14,4 +14,3 @@ def web_search_node(
         "documents": results,
         "web_search_needed": False,
     }
-

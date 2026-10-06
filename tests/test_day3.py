@@ -155,4 +155,3 @@ def test_compiled_graph_execution(tmp_path, test_chunks):
     assert final_state["web_search_needed"] is False
     assert isinstance(final_state["generation"], str)
     assert len(final_state["generation"]) > 0
-

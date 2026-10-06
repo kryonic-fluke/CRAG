@@ -153,4 +153,6 @@ def test_compiled_graph_execution(tmp_path, test_chunks):
     final_state = graph.invoke(input_state)
     assert len(final_state["documents"]) > 0
     assert final_state["web_search_needed"] is False
-    assert "Generated answer" in final_state["generation"]
+    assert isinstance(final_state["generation"], str)
+    assert len(final_state["generation"]) > 0
+

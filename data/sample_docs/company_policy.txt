@@ -1,0 +1,16 @@
+# Acme Corp Internal Engineering & HR Policy Guide
+
+## 1. Remote Work Policy
+All software engineers are eligible for full-time remote work within their country of employment. Engineers must be reachable on Slack between 10:00 AM and 4:00 PM local time for core team collaboration hours.
+
+## 2. Equipment Stipend
+Full-time employees receive a one-time home office setup stipend of $1,500 USD upon hire. In addition, engineers receive an annual tech refresher budget of $500 USD to purchase peripherals, monitors, or technical books.
+
+## 3. Paid Time Off (PTO)
+Acme Corp operates an unlimited PTO policy with a mandatory minimum of 20 days off per calendar year to prevent burnout. Any vacation request longer than two consecutive weeks requires two weeks prior notice to the engineering manager.
+
+## 4. Code Review & Deployment Standards
+- All Pull Requests require at least one approval from a peer engineer before merging into main.
+- Production deployments are automated via CI/CD pipelines and are frozen on Fridays after 2:00 PM local time.
+- All services exposing HTTP APIs must include automated Pydantic schema validation and integration tests.
+

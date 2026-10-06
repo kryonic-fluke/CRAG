@@ -1,0 +1,17 @@
+# Overview of Corrective Retrieval-Augmented Generation (CRAG)
+
+Corrective Retrieval-Augmented Generation (CRAG) is an advanced RAG architecture designed to address the key limitation of standard RAG: the assumption that retrieved documents are always relevant and accurate.
+
+In standard RAG, when a user asks a query, a vector search retrieves top-k documents. Even if the retrieved documents are completely irrelevant, noisy, or outdated, the generator LLM still attempts to answer using that text, often leading to hallucinations or unhelpful answers.
+
+CRAG introduces a self-correcting evaluation loop:
+1. Hybrid Retrieval: Combining dense vector embeddings (capturing semantic meaning) and BM25 sparse keyword matching (capturing exact terms and IDs).
+2. Document Relevance Grader: An evaluator node inspects each retrieved chunk and assigns a binary relevance score (Yes/No).
+3. Confidence & Routing:
+   - If retrieved documents are relevant, the system proceeds to Generation.
+   - If retrieved documents are irrelevant or confidence is low, the pipeline triggers a Web Search Fallback (via Tavily) to fetch external, real-time ground truth.
+4. Hallucination Guardrail: Once the answer is generated, a hallucination checker verifies whether the claims in the answer are mathematically supported by the retrieved context.
+5. Answer Relevance Check: The guardrail verifies that the response directly answers the user's initial prompt.
+
+Through this multi-step state machine, CRAG transforms naive RAG into a resilient, production-grade reasoning engine.
+

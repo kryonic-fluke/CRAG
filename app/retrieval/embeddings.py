@@ -1,5 +1,6 @@
 from typing import List
 import hashlib
+import os
 import numpy as np
 from langchain_core.embeddings import Embeddings
 
@@ -7,20 +8,10 @@ from app.core.config import settings
 
 
 class DeterministicHashEmbeddings(Embeddings):
-    """
-    Lightweight, deterministic embedding generator using SHA-256 + pseudo-random projection.
-
-    Why this exists:
-    - Guarantees 100% offline, lightning-fast testing and CI execution with 0 network calls.
-    - Produces fixed 384-dimensional unit-norm float vectors.
-    - Identical texts always produce identical vectors.
-    """
-
     def __init__(self, dim: int = 384) -> None:
         self.dim = dim
 
     def _embed(self, text: str) -> List[float]:
-
         seed = int(hashlib.sha256(text.encode("utf-8")).hexdigest()[:8], 16)
         rng = np.random.default_rng(seed)
         vec = rng.standard_normal(self.dim)
@@ -38,11 +29,6 @@ class DeterministicHashEmbeddings(Embeddings):
 
 
 class ChromaDefaultEmbeddingsWrapper(Embeddings):
-    """
-    Wraps Chroma's built-in ONNX all-MiniLM-L6-v2 embedding model into LangChain Embeddings.
-    Free, local, runs on CPU/GPU without external API keys.
-    """
-
     def __init__(self) -> None:
         import chromadb.utils.embedding_functions as ef
 
@@ -50,7 +36,6 @@ class ChromaDefaultEmbeddingsWrapper(Embeddings):
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         embeddings = self._ef(texts)
-
         return [[float(x) for x in e] for e in embeddings]
 
     def embed_query(self, text: str) -> List[float]:
@@ -59,20 +44,35 @@ class ChromaDefaultEmbeddingsWrapper(Embeddings):
 
 
 def get_embeddings_model() -> Embeddings:
-    """
-    Factory that selects the best available embedding model:
-    1. If a valid OpenAI API key is present -> OpenAIEmbeddings
-    2. Else -> Chroma's local all-MiniLM-L6-v2 ONNX embeddings
-    3. Fallback -> DeterministicHashEmbeddings
-    """
-    key = settings.openai_api_key
-    if key and key.startswith("sk-") and "mock" not in key.lower():
-        try:
-            from langchain_openai import OpenAIEmbeddings
+    provider = settings.llm_provider.lower().strip()
 
-            return OpenAIEmbeddings(api_key=key, model="text-embedding-3-small")
-        except Exception:
-            pass
+    if provider == "gemini":
+        gemini_key = (
+            settings.gemini_api_key
+            or settings.google_api_key
+            or os.environ.get("GEMINI_API_KEY")
+            or os.environ.get("GOOGLE_API_KEY")
+        )
+        if gemini_key and "mock" not in gemini_key.lower():
+            try:
+                from langchain_google_genai import GoogleGenerativeAIEmbeddings
+
+                return GoogleGenerativeAIEmbeddings(
+                    model="models/embedding-001",
+                    google_api_key=gemini_key,
+                )
+            except Exception:
+                pass
+
+    if provider == "openai":
+        key = settings.openai_api_key
+        if key and key.startswith("sk-") and "mock" not in key.lower():
+            try:
+                from langchain_openai import OpenAIEmbeddings
+
+                return OpenAIEmbeddings(api_key=key, model="text-embedding-3-small")
+            except Exception:
+                pass
 
     try:
         return ChromaDefaultEmbeddingsWrapper()

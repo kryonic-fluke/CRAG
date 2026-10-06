@@ -3,7 +3,7 @@ import re
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableLambda
 
-from app.core.config import settings
+from app.core.llm import get_chat_llm
 from app.schemas.grader import GradeDocuments
 
 GRADER_SYSTEM_PROMPT = """You are an expert document relevance grader assessing whether a retrieved document chunk is relevant to a user question.
@@ -75,16 +75,9 @@ class MockDocGrader:
 
 
 def get_doc_grader_chain():
-    key = settings.openai_api_key
-    if key and key.startswith("sk-") and "mock" not in key.lower():
+    llm = get_chat_llm(temperature=0.0)
+    if llm is not None:
         try:
-            from langchain_openai import ChatOpenAI
-
-            llm = ChatOpenAI(
-                model=settings.openai_model_name,
-                temperature=0,
-                api_key=key,
-            )
             structured_llm = llm.with_structured_output(GradeDocuments)
             return grader_prompt | structured_llm
         except Exception:

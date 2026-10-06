@@ -24,7 +24,9 @@ def test_empty_content_rejected():
     with pytest.raises(ValidationError) as exc_info:
         DocumentChunk(content="   ", metadata=meta)
 
-    assert "DocumentChunk content cannot be empty or pure whitespace" in str(exc_info.value)
+    assert "DocumentChunk content cannot be empty or pure whitespace" in str(
+        exc_info.value
+    )
 
 
 def test_ingest_config_overlap_validation():
@@ -37,7 +39,9 @@ def test_ingest_config_overlap_validation():
 
 def test_ingestion_pipeline_processes_text():
     """Verify that DocumentIngestionPipeline splits text into validated Pydantic chunks."""
-    pipeline = DocumentIngestionPipeline(config=IngestConfig(chunk_size=50, chunk_overlap=10))
+    pipeline = DocumentIngestionPipeline(
+        config=IngestConfig(chunk_size=50, chunk_overlap=10)
+    )
     sample_text = "Paragraph one with some meaningful text.\n\nParagraph two with another sentence."
 
     chunks = pipeline.process_text(text=sample_text, source="memory_doc")
@@ -54,10 +58,11 @@ def test_ingestion_pipeline_sample_docs():
     data_dir = Path("data/sample_docs")
     assert data_dir.exists(), "Sample docs directory must exist"
 
-    pipeline = DocumentIngestionPipeline(config=IngestConfig(chunk_size=400, chunk_overlap=80))
+    pipeline = DocumentIngestionPipeline(
+        config=IngestConfig(chunk_size=400, chunk_overlap=80)
+    )
     result = pipeline.ingest_directory(data_dir)
 
     assert result.total_documents_loaded >= 2
     assert result.total_chunks_created > 0
     assert len(result.chunks) == result.total_chunks_created
-

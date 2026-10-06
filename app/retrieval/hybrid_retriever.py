@@ -9,7 +9,7 @@ class HybridRetriever:
     """
     Production Hybrid Retriever fusing Dense Semantic Vector Search (Chroma)
     and Sparse Lexical Keyword Search (BM25).
-    
+
     Supports:
     1. Reciprocal Rank Fusion (RRF): Rank-based fusion robust against scale differences.
     2. Weighted Score Fusion: Linear combination of normalized similarity scores.
@@ -19,7 +19,7 @@ class HybridRetriever:
         self,
         vector_store: ChromaVectorStore,
         bm25_retriever: BM25KeywordRetriever,
-        config: Optional[HybridRetrieverConfig] = None
+        config: Optional[HybridRetrieverConfig] = None,
     ) -> None:
         self.vector_store = vector_store
         self.bm25_retriever = bm25_retriever
@@ -34,9 +34,7 @@ class HybridRetriever:
         return len(chunks)
 
     def _reciprocal_rank_fusion(
-        self,
-        dense_results: List[SearchResult],
-        bm25_results: List[SearchResult]
+        self, dense_results: List[SearchResult], bm25_results: List[SearchResult]
     ) -> List[SearchResult]:
         """
         Computes RRF score for each unique document:
@@ -46,11 +44,9 @@ class HybridRetriever:
         w_dense = self.config.dense_weight
         w_bm25 = self.config.bm25_weight
 
-        # Dictionary tracking aggregated scores and representative candidate models
         rrf_scores: Dict[str, float] = {}
         candidate_map: Dict[str, SearchResult] = {}
 
-        # 1. Accumulate dense rankings
         for result in dense_results:
             cid = result.chunk_id
             rank = result.rank or 1
@@ -58,7 +54,6 @@ class HybridRetriever:
             rrf_scores[cid] = rrf_scores.get(cid, 0.0) + score_contribution
             candidate_map[cid] = result
 
-        # 2. Accumulate BM25 rankings
         for result in bm25_results:
             cid = result.chunk_id
             rank = result.rank or 1
@@ -70,11 +65,11 @@ class HybridRetriever:
         if not rrf_scores:
             return []
 
-        # Normalize RRF scores to [0.0, 1.0] relative to highest RRF score
         max_rrf = max(rrf_scores.values())
 
-        # Sort chunk IDs by final RRF score descending
-        sorted_ids = sorted(rrf_scores.keys(), key=lambda cid: rrf_scores[cid], reverse=True)
+        sorted_ids = sorted(
+            rrf_scores.keys(), key=lambda cid: rrf_scores[cid], reverse=True
+        )
 
         final_results: List[SearchResult] = []
         for new_rank, cid in enumerate(sorted_ids[: self.config.top_k], start=1):
@@ -87,16 +82,14 @@ class HybridRetriever:
                 metadata=original.metadata,
                 score=round(normalized_score, 4),
                 retrieval_method="hybrid",
-                rank=new_rank
+                rank=new_rank,
             )
             final_results.append(hybrid_result)
 
         return final_results
 
     def _weighted_score_fusion(
-        self,
-        dense_results: List[SearchResult],
-        bm25_results: List[SearchResult]
+        self, dense_results: List[SearchResult], bm25_results: List[SearchResult]
     ) -> List[SearchResult]:
         """
         Computes weighted linear score fusion:
@@ -133,7 +126,7 @@ class HybridRetriever:
                 metadata=original.metadata,
                 score=round(min(1.0, blended_score), 4),
                 retrieval_method="hybrid",
-                rank=new_rank
+                rank=new_rank,
             )
             final_results.append(hybrid_result)
 
@@ -143,9 +136,9 @@ class HybridRetriever:
         """
         Executes hybrid retrieval: fetches dense + sparse candidates and fuses them.
         """
-        # Fetch candidate pools from each retriever (fetch top_k * 2 to give fusion room to rerank)
+
         pool_size = max(self.config.top_k * 2, 8)
-        
+
         dense_results = self.vector_store.similarity_search(query=query, k=pool_size)
         bm25_results = self.bm25_retriever.similarity_search(query=query, k=pool_size)
 
@@ -160,6 +153,5 @@ class HybridRetriever:
             query=query,
             total_results=len(fused),
             results=fused,
-            strategy_used=strategy_desc
+            strategy_used=strategy_desc,
         )
-

@@ -1,4 +1,5 @@
 """Retrieval and document processing components."""
+
 from app.retrieval.document_loader import DocumentIngestionPipeline
 from app.retrieval.embeddings import get_embeddings_model, DeterministicHashEmbeddings
 from app.retrieval.vector_store import ChromaVectorStore

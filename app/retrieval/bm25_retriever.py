@@ -9,7 +9,7 @@ from app.schemas.retrieval import SearchResult
 class BM25KeywordRetriever:
     """
     BM25 (Best Matching 25) Sparse Lexical Retriever.
-    
+
     Why this is essential alongside Vector Search:
     - Dense vectors map sentences to semantic "concepts", but often miss exact keyword hits:
       e.g., "$1,500", "PTO", "Node.js", specific error codes, or function names.
@@ -60,17 +60,14 @@ class BM25KeywordRetriever:
         raw_scores = self.bm25.get_scores(tokenized_query)
         max_score = float(max(raw_scores)) if len(raw_scores) > 0 else 0.0
 
-        # Pair each chunk with its raw score
         scored_candidates = []
         for chunk, raw_score in zip(self.chunks, raw_scores):
-            if raw_score > 0:  # Only consider documents with at least one matching term
+            if raw_score > 0:
                 norm_score = (raw_score / max_score) if max_score > 0 else 0.0
                 scored_candidates.append((chunk, norm_score))
 
-        # Sort descending by normalized score
         scored_candidates.sort(key=lambda x: x[1], reverse=True)
 
-        # Slice top-k
         top_candidates = scored_candidates[:k]
 
         results: List[SearchResult] = []
@@ -81,7 +78,7 @@ class BM25KeywordRetriever:
                 metadata=chunk.metadata,
                 score=round(score, 4),
                 retrieval_method="bm25",
-                rank=rank_idx
+                rank=rank_idx,
             )
             results.append(res)
 
@@ -89,4 +86,3 @@ class BM25KeywordRetriever:
 
     def count(self) -> int:
         return len(self.chunks)
-
